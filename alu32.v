@@ -1,18 +1,20 @@
-module ALU(
-    input [31:0] a, b;
-    input [4:0] ALUop;
-    output zero;
-    output reg [31:0] result);
+module alu(input	  [3:0]ctl,
+           input	  [31:0]a, b, 
+           output reg [31:0]result,
+           output reg zero);
 
-    assign zero = (result==0);
-    always @(ALUop, a, b) begin
-        case (ALUop)
-            0: result <= a & b; //0000 AND
-            1: result <= a | b; //0001 OR
-            2: result <= a + b; //0010 ADD
-            6: result <= a - b; //0110 SUB
-            7: result <= a < b ? b : 0;//0111 SLT
-            12: result <= ~(a | b); //1100 NOR
-            default: result <= 0;
-        endcase
-    end
+  always @(a or b or ctl)
+  begin
+    case (ctl)
+      4'b0000 : result = a & b; // AND
+      4'b0001 : result = a | b; // OR
+      4'b0010 : result = a + b; // ADD
+      4'b0110 : result = a - b; // SUBTRACT
+      4'b0111 : if (a < b) result = 32'd1; 
+               else result = 32'd0; //SLT      
+      default : result = 32'hxxxx;
+   endcase
+   if (result == 32'd0) zero = 1;
+   else zero = 0;
+ end
+endmodule
